@@ -1,15 +1,36 @@
 import { View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import React, { useState } from "react";
-import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
 import { TaskTypes } from "../../types/tasks";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
+import { tasks } from "~/data/tasks-data";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { Check } from "lucide-react-native";
 
-export default function AddTask() {
-  const [task, setTask] = useState<Omit<TaskTypes, "id">>({
+export default function EditTask() {
+  const { id } = useLocalSearchParams();
+  const [task, setTask] = useState<TaskTypes>();
+  //edit successfully dialog
+  const [showEditSuccess, setShowEditSuccess] = useState(false);
+
+  useEffect(() => {
+    const task = tasks.find((task) => task.id === Number(id));
+    setTask(task);
+  }, [id]);
+
+  const [taskData, setTaskData] = useState<Omit<TaskTypes, "id">>({
     headTitle: "",
     title: "",
     description: "",
@@ -17,8 +38,8 @@ export default function AddTask() {
     status: "pending",
   });
 
-  const handleInputChange = (field: keyof typeof task, value: string) => {
-    setTask((prev) => ({
+  const handleInputChange = (field: keyof typeof taskData, value: string) => {
+    setTaskData((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -27,7 +48,7 @@ export default function AddTask() {
   const handleSubmit = () => {
     // Here you would typically save the task to your state management or API
     // Navigate back after submission
-    router.back();
+    setShowEditSuccess(true);
   };
 
   return (
@@ -45,7 +66,7 @@ export default function AddTask() {
             <Label htmlFor="title">Task Title</Label>
             <Input
               id="title"
-              value={task.title}
+              value={task?.title}
               onChangeText={(text: string) => handleInputChange("title", text)}
               className="mb-4"
               placeholder="Task Title"
@@ -56,7 +77,7 @@ export default function AddTask() {
             <Label htmlFor="headTitle">Short Description</Label>
             <Input
               id="headTitle"
-              value={task.headTitle}
+              value={task?.headTitle}
               onChangeText={(text: string) =>
                 handleInputChange("headTitle", text)
               }
@@ -69,7 +90,7 @@ export default function AddTask() {
             <Label htmlFor="description">Detailed Description</Label>
             <Textarea
               id="description"
-              value={task.description}
+              value={task?.description}
               onChangeText={(text: string) =>
                 handleInputChange("description", text)
               }
@@ -83,7 +104,7 @@ export default function AddTask() {
             <Label htmlFor="date">Due Date</Label>
             <Input
               id="date"
-              value={task.date}
+              value={task?.date}
               onChangeText={(text: string) => handleInputChange("date", text)}
               className="mb-6"
               placeholder="Due Date"
@@ -95,8 +116,35 @@ export default function AddTask() {
         onPress={handleSubmit}
         className="absolute right-6 bottom-6 left-6 text-center rounded-full"
       >
-        <Text className="text-background">Add Task</Text>
+        <Text className="text-background">Save Changes</Text>
       </Button>
+      <Dialog open={showEditSuccess} onOpenChange={setShowEditSuccess}>
+        <DialogContent>
+          <DialogHeader className="flex-col gap-3 items-center">
+            <View className="p-4 bg-green-500 rounded-full">
+              <Check color="white" size={60} />
+            </View>
+            <View className="items-center">
+              <DialogTitle className="text-3xl font-bold">
+                Task edited successfully!
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                Your task has been edited successfully.
+              </DialogDescription>
+            </View>
+          </DialogHeader>
+          <DialogFooter className="items-end mt-4">
+            <Button
+              onPress={() => {
+                setShowEditSuccess(false);
+                router.back();
+              }}
+            >
+              <Text className="text-background">OK</Text>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </KeyboardAvoidingView>
   );
 }

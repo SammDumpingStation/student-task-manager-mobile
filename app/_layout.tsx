@@ -78,6 +78,20 @@ export default function RootLayout() {
             headerRight: () => <ThemeToggle />,
           }}
         />
+        <Stack.Screen
+          name="add-task/index"
+          options={{
+            title: "Add New Task",
+            headerRight: () => <ThemeToggle />,
+          }}
+        />
+        <Stack.Screen
+          name="edit-task/[id]"
+          options={{
+            title: "Edit Task",
+            headerRight: () => <ThemeToggle />,
+          }}
+        />
       </Stack>
       <PortalHost />
     </ThemeProvider>

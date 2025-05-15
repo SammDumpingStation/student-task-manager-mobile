@@ -66,7 +66,7 @@ export default function TaskCard({ item }: { item: any }) {
             <View className="flex-row gap-2 justify-end items-center mt-3">
               <CalendarClock
                 strokeWidth={STROKE_WIDTH}
-                color={darkMode ? "#fff" : "#000"}
+                color={darkMode ? "#fff" : item.status === "completed" ? "gray" : "#000"}
               />
               <Text className={clsx("text-foreground", item.status === "completed" && "text-muted-foreground")}>{formatDate(item.date)}</Text>
             </View>
@@ -76,7 +76,7 @@ export default function TaskCard({ item }: { item: any }) {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Task Done?</DialogTitle>
+            <DialogTitle>Confirm Task as Complete?</DialogTitle>
             <DialogDescription>
               Are you sure you want to mark this task as complete?
             </DialogDescription>
