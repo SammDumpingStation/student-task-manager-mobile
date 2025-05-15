@@ -1,23 +1,17 @@
-import {
-  Text,
-  ScrollView,
-  View,
-  FlatList,
-  Platform,
-  useColorScheme,
-} from "react-native";
+import { Text, ScrollView, View, FlatList, Platform } from "react-native";
 import React from "react";
 import TaskCard from "~/components/TaskCard";
-import { completedTasks, todayTasks, upcomingTasks } from "~/data/tasks-data";
 import { Button } from "~/components/ui/button";
 import { ChevronRight, PlusIcon } from "lucide-react-native";
 import { STROKE_WIDTH } from "~/utils/number-data";
 import clsx from "clsx";
 import { router } from "expo-router";
 import HeaderTitle from "~/components/HeaderTitle";
+import { filterTasks } from "~/utils/filter-tasks";
+import { useColorScheme } from "~/lib/useColorScheme";
 
 const ViewAllButton = ({ title, id }: { title: string; id: number }) => {
-  const darkMode = useColorScheme() === "dark";
+  const darkMode = useColorScheme().isDarkColorScheme;
 
   return (
     <Button
@@ -25,17 +19,19 @@ const ViewAllButton = ({ title, id }: { title: string; id: number }) => {
       className="flex-row mx-auto mt-3"
       onPress={() => router.push(`/tasks/${id}`)}
     >
-      <Text className="text-foreground">View All {title}</Text>
-      <ChevronRight
-        strokeWidth={STROKE_WIDTH}
-        color={darkMode ? "#fff" : "#000"}
-      />
+      <View className="flex-row gap-2 items-center">
+        <Text className="text-foreground">View All {title}</Text>
+        <ChevronRight
+          strokeWidth={STROKE_WIDTH}
+          color={darkMode ? "#fff" : "gray"}
+        />
+      </View>
     </Button>
   );
 };
 
 export default function Index() {
-  const darkMode = useColorScheme() === "dark";
+  const darkMode = useColorScheme().isDarkColorScheme;
   return (
     <View className="relative flex-1">
       <Text className="p-4 text-2xl font-bold text-foreground">
@@ -50,7 +46,7 @@ export default function Index() {
         <View>
           <HeaderTitle title="Today's Tasks" />
           <FlatList
-            data={todayTasks}
+            data={filterTasks("today")}
             scrollEnabled={false}
             contentContainerClassName="gap-3"
             keyExtractor={(item) => item.id.toString()}
@@ -61,7 +57,7 @@ export default function Index() {
         <View>
           <HeaderTitle title="Upcoming Tasks" />
           <FlatList
-            data={upcomingTasks}
+            data={filterTasks("upcoming")}
             scrollEnabled={false}
             contentContainerClassName="gap-3"
             keyExtractor={(item) => item.id.toString()}
@@ -72,7 +68,7 @@ export default function Index() {
         <View>
           <HeaderTitle title="Completed Tasks" />
           <FlatList
-            data={completedTasks}
+            data={filterTasks("completed")}
             scrollEnabled={false}
             contentContainerClassName="gap-3"
             keyExtractor={(item) => item.id.toString()}
@@ -86,7 +82,12 @@ export default function Index() {
         size={"custom"}
         onPress={() => router.push("/add-task")}
       >
-        <PlusIcon color={darkMode ? "#000" : "#fff"} />
+        <Text>
+          <PlusIcon
+            strokeWidth={STROKE_WIDTH}
+            color={darkMode ? "#000" : "#fff"}
+          />
+        </Text>
       </Button>
     </View>
   );
