@@ -8,14 +8,7 @@ import { STROKE_WIDTH } from "~/utils/number-data";
 import { Button } from "./ui/button";
 import { router } from "expo-router";
 import clsx from "clsx";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 export default function TaskCard({ item }: { item: any }) {
   const darkMode = useColorScheme() === "dark";
@@ -50,7 +43,7 @@ export default function TaskCard({ item }: { item: any }) {
             <Text
               className={clsx(
                 "text-lg font-semibold text-foreground",
-                checked || item.status === "completed" && "line-through"
+                checked || (item.status === "completed" && "line-through")
               )}
             >
               {item.title}
@@ -58,7 +51,7 @@ export default function TaskCard({ item }: { item: any }) {
             <Text
               className={clsx(
                 "text-sm text-justify text-muted-foreground line-clamp-1",
-                checked || item.status === "completed" && "line-through"
+                checked || (item.status === "completed" && "line-through")
               )}
             >
               {item.description}
@@ -66,42 +59,31 @@ export default function TaskCard({ item }: { item: any }) {
             <View className="flex-row gap-2 justify-end items-center mt-3">
               <CalendarClock
                 strokeWidth={STROKE_WIDTH}
-                color={darkMode ? "#fff" : item.status === "completed" ? "gray" : "#000"}
+                color={
+                  darkMode
+                    ? "#fff"
+                    : item.status === "completed"
+                    ? "gray"
+                    : "#000"
+                }
               />
-              <Text className={clsx("text-foreground", item.status === "completed" && "text-muted-foreground")}>{formatDate(item.date)}</Text>
+              <Text
+                className={clsx(
+                  "text-foreground",
+                  item.status === "completed" && "text-muted-foreground"
+                )}
+              >
+                {formatDate(item.date)}
+              </Text>
             </View>
           </View>
         </CardContent>
       </Card>
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Task as Complete?</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to mark this task as complete?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex-row justify-end items-center">
-            <Button
-              variant="outline"
-              onPress={() => {
-                setDialogOpen(false);
-                setChecked(false);
-              }}
-            >
-              <Text className="text-foreground">Cancel</Text>
-            </Button>
-            <Button
-              onPress={() => {
-                setDialogOpen(false);
-                setChecked(true);
-              }}
-            >
-              <Text className="text-background">Confirm</Text>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmationDialog
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+        setChecked={setChecked}
+      />
     </Button>
   );
 }

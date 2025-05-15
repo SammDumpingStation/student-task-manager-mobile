@@ -17,6 +17,7 @@ import { formatDate } from "~/utils/date-formatter";
 import Animated, { FadeIn } from "react-native-reanimated";
 import clsx from "clsx";
 import { PencilLine } from "lucide-react-native";
+import ConfirmationDialog from "~/components/ConfirmationDialog";
 
 // Fallback icon for status if needed
 const StatusIcon = ({ status }: { status?: string }) => {
@@ -29,6 +30,8 @@ const StatusIcon = ({ status }: { status?: string }) => {
 export default function Task() {
   const { id } = useLocalSearchParams();
   const [task, setTask] = useState<TaskTypes>();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [checked, setChecked] = useState(false);
   useEffect(() => {
     const task = tasks.find((task) => task.id === Number(id));
     setTask(task);
@@ -89,13 +92,32 @@ export default function Task() {
           </CardContent>
         </Card>
       </Animated.View>
-      <Button
-        onPress={() => router.push(`/edit-task/${task.id}`)}
-        accessibilityLabel="Edit Task"
-        className="absolute right-6 bottom-6 left-6 text-center rounded-full"
-      >
-        <Text className="text-background">Edit Task</Text>
-      </Button>
+      {task.status !== "completed" && (
+        <>
+          <View className="absolute right-6 bottom-6 left-6 flex-1">
+            <Button
+              onPress={() => setDialogOpen(true)}
+              accessibilityLabel="Edit Task"
+              className="text-center rounded-full"
+            >
+              <Text className="text-background">Mark as Done</Text>
+            </Button>
+            <Button
+              variant="ghost"
+              onPress={() => router.push(`/edit-task/${task.id}`)}
+              accessibilityLabel="Edit Task"
+              className="text-center rounded-full"
+            >
+              <Text className="text-foreground">Edit Task</Text>
+            </Button>
+          </View>
+          <ConfirmationDialog
+            dialogOpen={dialogOpen}
+            setDialogOpen={setDialogOpen}
+            setChecked={setChecked}
+          />
+        </>
+      )}
     </View>
   );
 }
